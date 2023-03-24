@@ -1,0 +1,8 @@
+- [[User]]
+- [[Account]]
+	-  Client (Like a Personal Account?)
+	-  Small Business
+	-  Community (What does this mean?)
+- Login
+- Transaction
+- UserDatabase
