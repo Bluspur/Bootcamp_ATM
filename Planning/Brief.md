@@ -6,7 +6,7 @@ ___
 - [ ] Users should be able to create new accounts if they don't already have one of each type.
 - [ ] If a user does not have any accounts, they should be asked if they would like to create one.
 - [ ] Restrictions will be placed on all accounts that require signatories.
-- [ ] Small business, community, and client accounts can have overdraft facilities of £1,000, £2,500, and £1,500 respectively.
+- [x] Small business, community, and client accounts can have overdraft facilities of £1,000, £2,500, and £1,500 respectively.
 - [ ] Users can create Small Business, Community, and Client Accounts.
 - [ ] Users should be able to Check the balance of their accounts as well as make withdrawals, deposits, and transfers to other accounts that they own.
 ## School Requirements
