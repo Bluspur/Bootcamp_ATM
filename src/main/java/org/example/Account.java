@@ -2,16 +2,13 @@ package org.example;
 
 import java.math.BigDecimal;
 
-public class Account {
+public abstract class Account {
     private BigDecimal balance;
-    private final BigDecimal overdraftLimit = new BigDecimal("1000");
+    private final BigDecimal overdraftLimit;
 
-    public Account(BigDecimal openingBalance) {
-        balance = openingBalance;
-    }
-
-    public Account() {
-        balance = new BigDecimal("0");
+    public Account(BigDecimal openingBalance, BigDecimal overdraftLimit) {
+        this.balance = openingBalance;
+        this.overdraftLimit = overdraftLimit;
     }
 
     public BigDecimal getBalance() {
