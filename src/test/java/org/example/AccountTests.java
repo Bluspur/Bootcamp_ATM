@@ -8,17 +8,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class AccountTests {
     @Test
-    void testNewAccountBalanceShouldReturnZeroByDefault() {
-        Account newAccount = new Account();
-
-        BigDecimal actualBalance = newAccount.getBalance();
-        BigDecimal expectedBalance = new BigDecimal("0");
-        assertEquals(0, expectedBalance.compareTo(actualBalance));
-    }
-
-    @Test
     void testNewAccountBalanceShouldReturnOpeningBalance() {
-        Account newAccount = new Account(new BigDecimal("1234.56"));
+        Account newAccount = new CommunityAccount(new BigDecimal("1234.56"));
 
         BigDecimal expectedBalance = new BigDecimal("1234.56");
         BigDecimal actualBalance = newAccount.getBalance();
@@ -27,7 +18,7 @@ public class AccountTests {
 
     @Test
     void testAddingMoneyToAccountShouldReturnNewBalance() {
-        Account newAccount = new Account();
+        Account newAccount = new CommunityAccount(BigDecimal.ZERO);
 
         BigDecimal balanceToAdd = new BigDecimal("1234.56");
         BigDecimal expectedBalance = new BigDecimal("1234.56");
@@ -40,9 +31,9 @@ public class AccountTests {
 
     @Test
     void testSubtractingMoneyFromAccountShouldReturnNewBalance() {
-        Account newAccount = new Account(new BigDecimal("500.00"));
+        Account newAccount = new CommunityAccount(new BigDecimal("1234.56"));
 
-        BigDecimal balanceToSubtract = new BigDecimal("500.00");
+        BigDecimal balanceToSubtract = new BigDecimal("1234.56");
         BigDecimal expectedBalance = new BigDecimal("0");
 
         try {
@@ -58,15 +49,15 @@ public class AccountTests {
 
     @Test
     void testSubtractingMoreMoneyThanOverdraftLimitShouldThrowException() {
-        Account newAccount = new Account();
-        BigDecimal balanceToSubtract = new BigDecimal("1500.00");
+        Account newAccount = new CommunityAccount(BigDecimal.ZERO);
+        BigDecimal balanceToSubtract = new BigDecimal("9999.99");
 
         assertThrows(BalanceExceedsOverdraftException.class, () -> newAccount.subtractFunds(balanceToSubtract));
     }
 
     @Test
     void testAddingNegativeFundsShouldThrowException() {
-        Account newAccount = new Account();
+        Account newAccount = new CommunityAccount(BigDecimal.ZERO);
         BigDecimal negativeValue = new BigDecimal("-1");
 
         assertThrows(
@@ -77,7 +68,7 @@ public class AccountTests {
 
     @Test
     void testSubtractingNegativeFundsShouldThrowException() {
-        Account newAccount = new Account();
+        Account newAccount = new CommunityAccount(BigDecimal.ZERO);
         BigDecimal negativeValue = new BigDecimal("-1");
 
         assertThrows(
