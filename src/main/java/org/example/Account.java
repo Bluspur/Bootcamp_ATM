@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 public class Account {
     private BigDecimal balance;
+    private final BigDecimal overdraftLimit = new BigDecimal("1000");
 
     public Account(BigDecimal openingBalance) {
         balance = openingBalance;
@@ -23,8 +24,11 @@ public class Account {
         balance = balance.add(balanceToAdd);
     }
 
-    public void subtractFunds(BigDecimal balanceToSubtract) {
+    public void subtractFunds(BigDecimal balanceToSubtract) throws BalanceExceedsOverdraftException {
         validateValueIsNonNegative(balanceToSubtract);
+
+        if (balance.subtract(balanceToSubtract).compareTo(BigDecimal.ZERO.subtract(overdraftLimit)) < 0)
+            throw new BalanceExceedsOverdraftException("Account balance must not exceed overdraft limit");
 
         balance = balance.subtract(balanceToSubtract);
     }
