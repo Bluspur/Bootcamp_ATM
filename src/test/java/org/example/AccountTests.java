@@ -40,15 +40,28 @@ public class AccountTests {
 
     @Test
     void testSubtractingMoneyFromAccountShouldReturnNewBalance() {
-        Account newAccount = new Account(new BigDecimal("1234.56"));
+        Account newAccount = new Account(new BigDecimal("500.00"));
 
-        BigDecimal balanceToSubtract = new BigDecimal("1234.56");
+        BigDecimal balanceToSubtract = new BigDecimal("500.00");
         BigDecimal expectedBalance = new BigDecimal("0");
 
-        newAccount.subtractFunds(balanceToSubtract);
+        try {
+            newAccount.subtractFunds(balanceToSubtract);
+        } catch (BalanceExceedsOverdraftException e) {
+            throw new RuntimeException(e);
+        }
+
         BigDecimal actualBalance = newAccount.getBalance();
 
         assertEquals(0, expectedBalance.compareTo(actualBalance));
+    }
+
+    @Test
+    void testSubtractingMoreMoneyThanOverdraftLimitShouldThrowException() {
+        Account newAccount = new Account();
+        BigDecimal balanceToSubtract = new BigDecimal("1500.00");
+
+        assertThrows(BalanceExceedsOverdraftException.class, () -> newAccount.subtractFunds(balanceToSubtract));
     }
 
     @Test
