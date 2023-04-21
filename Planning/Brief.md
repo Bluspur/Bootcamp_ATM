@@ -1,5 +1,5 @@
 ## Scenario
-In this project, design a Java application that will allow business users to access time critical banking on-the-go. Users will be required to login to the application upon start-up, and upon successful login will be directed to a menu where they will be able to manage their accounts with the bank or even create new accounts if they need to.
+In this project, design a Java application that will allow business users to access time critical banking on-the-go. Users will be required to log in to the application upon start-up, and upon successful login will be directed to a menu where they will be able to manage their accounts with the bank or even create new accounts if they need to.
 ___
 ## Key Requirements
 - [ ] Users should be able to manage any existing accounts they have.
@@ -17,7 +17,7 @@ ___
 - Proper Object Oriented Design.
 - Explore Interfaces and Abstractions in Java.
 - Explore Database options for storing account data. SQLite etc.
-- Maintain a steady flow of **small** updates to Github, for the sake of tracking progress.
+- Maintain a steady flow of **small** updates to GitHub, for the sake of tracking progress.
 - Explore Java documentation generation.
 ### Stretch Goals Given Extra Time
 - Explore techniques to manage polling user input.
