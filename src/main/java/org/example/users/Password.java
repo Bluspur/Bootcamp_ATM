@@ -1,6 +1,4 @@
-package org.example;
-
-import java.util.Objects;
+package org.example.users;
 
 /**
  * The Password class wraps a String class and provides
@@ -13,7 +11,7 @@ import java.util.Objects;
  * @author craig
  */
 public class Password {
-    private final String value;
+    final String value;
     static final int MINIMUM_LENGTH = 5;
     static final int MAXIMUM_LENGTH = 256;
 
@@ -22,16 +20,23 @@ public class Password {
         this.value = password;
     }
 
-    public boolean verify(String other) {
-        return Objects.equals(this.value, other);
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+
+        if (o instanceof Password password)
+            return value.equals(password.value);
+
+        return false;
     }
 
     private void validate(String password) throws IllegalArgumentException {
         if (password == null)
             throw new IllegalArgumentException("Password must not be null.");
         if (password.length() < MINIMUM_LENGTH)
-            throw new IllegalArgumentException("Password must be longer than " + MINIMUM_LENGTH + "characters.");
+            throw new IllegalArgumentException("Password must be longer than " + MINIMUM_LENGTH + " characters.");
         if (password.length() > MAXIMUM_LENGTH)
-            throw new IllegalArgumentException("Password must be shorter than " + MAXIMUM_LENGTH + "characters.");
+            throw new IllegalArgumentException("Password must be shorter than " + MAXIMUM_LENGTH + " characters.");
     }
 }

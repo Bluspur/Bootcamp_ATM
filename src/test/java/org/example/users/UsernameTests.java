@@ -1,5 +1,6 @@
-package org.example;
+package org.example.users;
 
+import org.example.users.Username;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -8,6 +9,11 @@ class UsernameTests {
     @Test
     void testValidUsernameDoesNotThrowException() {
         assertDoesNotThrow(() -> new Username("valid"));
+    }
+
+    @Test
+    void testValidUsernameWithSpacesDoesNotThrowException() {
+        assertDoesNotThrow(() -> new Username("Tommy Atkins"));
     }
 
     @Test
@@ -29,5 +35,11 @@ class UsernameTests {
 
         assertThrows(IllegalArgumentException.class,
                 () -> new Username(longString));
+    }
+
+    @Test
+    void testUsernameContainingIllegalCharactersThrowsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> new Username("!!Invalid!!"));
     }
 }
