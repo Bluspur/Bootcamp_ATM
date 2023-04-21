@@ -81,3 +81,6 @@ fabric.properties
 
 # Builds etc.
 /target/
+
+# IntelliJ idea artifacts?
+/.idea/artifacts/
