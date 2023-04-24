@@ -1,6 +1,6 @@
 package org.example.terminalApp.input;
 
-import org.example.terminalApp.TerminalConfig;
+import org.example.terminalApp.TerminalIO;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -18,7 +18,7 @@ class InputHelperTest {
 
     void initHelper(String mockInput) {
         var mockInputStream = new ByteArrayInputStream(mockInput.getBytes());
-        TerminalConfig config = new TerminalConfig(mockInputStream, System.out);
+        TerminalIO config = new TerminalIO(mockInputStream, System.out);
         inputHelper = new InputHelper(config);
     }
 

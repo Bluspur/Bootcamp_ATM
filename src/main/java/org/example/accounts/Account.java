@@ -1,15 +1,16 @@
 package org.example.accounts;
 
+import org.example.users.Username;
+
 import java.math.BigDecimal;
-import java.util.Optional;
 
 public class Account {
     private final String name;
-    private final Optional<String> signatory;
+    private final Username signatory;
     private BigDecimal balance;
     private final AccountType type;
 
-    Account(String name, Optional<String> signatory, BigDecimal openingBalance, AccountType type) {
+    Account(String name, Username signatory, BigDecimal openingBalance, AccountType type) {
         validateValueIsNonNegative(openingBalance);
         this.name = name;
         this.signatory = signatory;
@@ -30,13 +31,13 @@ public class Account {
     }
 
     public boolean hasRestrictions() {
-        return signatory.isPresent();
+        return signatory != null;
     }
 
-    public boolean verifySignatory(String signatory) {
-        if (this.signatory.isEmpty())
+    public boolean verifySignatory(Username signatory) {
+        if (this.signatory == null)
             return false;
-        return this.signatory.equals(Optional.of(signatory));
+        return this.signatory.equals(signatory);
     }
 
     public void addFunds(BigDecimal balanceToAdd) {
@@ -45,11 +46,11 @@ public class Account {
         balance = balance.add(balanceToAdd);
     }
 
-    public void subtractFunds(BigDecimal balanceToSubtract) throws BalanceExceedsOverdraftException {
+    public void withdrawFunds(BigDecimal balanceToSubtract) throws InsufficientFundsException {
         validateValueIsNonNegative(balanceToSubtract);
 
         if (balance.subtract(balanceToSubtract).compareTo(BigDecimal.ZERO.subtract(type.getOverdraftLimit())) < 0)
-            throw new BalanceExceedsOverdraftException("Account balance must not exceed overdraft limit");
+            throw new InsufficientFundsException("Balance must not be lower than overdraft limit.");
 
         balance = balance.subtract(balanceToSubtract);
     }
@@ -57,5 +58,9 @@ public class Account {
     static void validateValueIsNonNegative(BigDecimal value) {
         if (value.signum() == -1)
             throw new IllegalArgumentException("Value must not be negative.");
+    }
+
+    public BigDecimal getOverdraft() {
+        return type.getOverdraftLimit();
     }
 }

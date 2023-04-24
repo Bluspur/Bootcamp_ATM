@@ -1,11 +1,13 @@
 package org.example.accounts;
 
+import org.example.users.Username;
+
 import java.math.BigDecimal;
 import java.util.Optional;
 
 public class AccountBuilder {
     private String name = "";
-    private Optional<String> signatory = Optional.empty();
+    private Username signatory = null;
     private BigDecimal openingBalance = BigDecimal.ZERO;
     private AccountType type = null;
 
@@ -15,10 +17,8 @@ public class AccountBuilder {
         this.name = name;
     }
 
-    public void setSignatory(String signatory) throws IllegalArgumentException {
-        if (signatory.isBlank())
-            throw new IllegalArgumentException("Signature must not be blank if a signature is required.");
-        this.signatory = Optional.of(signatory);
+    public void setSignatory(Username signatory) throws IllegalArgumentException {
+        this.signatory = signatory;
     }
 
     public void setOpeningBalance(BigDecimal openingBalance) throws IllegalArgumentException {

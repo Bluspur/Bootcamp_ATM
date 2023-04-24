@@ -1,106 +1,114 @@
 package org.example.terminalApp.state;
 
 import org.example.Command;
-import org.example.accounts.Account;
-import org.example.accounts.AccountBuilder;
-import org.example.accounts.AccountType;
-import org.example.accounts.InvalidBuilderException;
+import org.example.accounts.*;
 import org.example.terminalApp.TerminalSession;
+import org.example.terminalApp.TransactionOutcome;
+import org.example.users.Username;
 
 import java.math.BigDecimal;
 import java.util.EnumSet;
 
 public class LoggedInState extends State {
+    private final EnumSet<Command> validCommands = EnumSet.of(
+            Command.Add,
+            Command.Withdraw,
+            Command.Transfer,
+            Command.Open,
+            Command.Logout,
+            Command.View,
+            Command.List,
+            Command.Help,
+            Command.Quit);
+
     public LoggedInState(TerminalSession session) {
         super(session);
+        if (context.userSession.hasAccounts())
+            context.printAccountsTable();
     }
 
     @Override
     public void printContextualInformation() {
-        if (context.userSession.accounts.isEmpty())
-            context.output.println("You have no open accounts. Open[o] an account to continue.");
-        else
-            context.printAccountsTable();
+        if (!context.userSession.hasAccounts())
+            context.printMessage("You have no open accounts. Open[o] an account to continue.");
     }
-
-    private final EnumSet<Command> validCommands
-            = EnumSet.of(Command.Open, Command.Logout, Command.View, Command.Help, Command.Quit);
 
     @Override
     public void handleCommand(Command command) {
         switch (command) {
-            case Open -> openAccount();
-            case Login, Register -> context.output.println("Error: User already logged in.");
+            case Open -> context.openNewAccount();
             case Logout -> context.logout();
-            case View -> viewAccount();
+            case View -> context.printAccountInfo();
+            case List -> context.printAccountsTable();
+            case Add -> addFundsToAccount();
+            case Withdraw -> withdrawFundsFromAccount();
+            case Transfer -> transferFunds();
             case Help -> context.printHelp(validCommands);
             case Quit -> context.stop();
+            default -> context.printMessage("Error: " + command
+                    + " is not possible before logging in.");
         }
     }
 
-    private void viewAccount() {
-        Account account = context.selectAccount();
-        if (account == null) {
-            context.output.println("Error: No account selected.");
-            return;
-        }
-        context.state = new ViewingDetailedState(context, account);
+    private void addFundsToAccount() {
+        Account account = context.getAccountFromCurrentUser("Enter account number");
+        BigDecimal amount = context.inputHelper.getPositiveCurrencyAmountFromUser("Amount");
+        account.addFunds(amount);
+        context.printMessage("Funds added successfully.");
     }
 
-    private void openAccount() {
-        var accBuilder = new AccountBuilder();
-
-        context.output.println("Which type of account do you want to open?");
-        context.output.print("Client[cl], Community[co], or Small Business [sb]: ");
-        String input = context.input.nextLine();
-        try {
-            AccountType type = AccountType.parse(input);
-            accBuilder.setType(type);
-        } catch (IllegalArgumentException e) {
-            context.output.println("Error: " + e.getMessage());
-            return;
+    private void withdrawFundsFromAccount() {
+        Account account = context.getAccountFromCurrentUser("Enter account number");
+        BigDecimal amount = context.inputHelper.getPositiveCurrencyAmountFromUser("Amount");
+        TransactionOutcome outcome = tryWithdraw(account, amount);
+        switch (outcome) {
+            case SUCCESS -> {
+                context.printMessage("Succeeded");
+            }
+            case INSUFFICIENT_FUNDS -> {
+                context.printMessage("Failed: Insufficient funds.");
+            }
+            case INSUFFICIENT_PRIVILEGES -> {
+                context.printMessage("Failed: Insufficient privileges.");
+            }
         }
+    }
 
-        context.output.print("Pick a name for the account: ");
-        input = context.input.nextLine();
-        try {
-            accBuilder.setName(input);
-        } catch (IllegalArgumentException e) {
-            context.output.println("Error: " + e.getMessage());
-            return;
-        }
-
-        context.output.print("Enter Starting Balance: £");
-        input = context.input.nextLine();
-        try {
-            var bd = new BigDecimal(input);
-            accBuilder.setOpeningBalance(bd);
-        } catch (RuntimeException e) {
-            context.output.println("Error: " + e.getMessage());
-            return;
-        }
-
-        context.output.println("Does the account require another signatory?");
-        context.output.print("Yes[Y] or No[Any Other Key]: ");
-        input = context.input.nextLine();
-        switch (input.toLowerCase()) {
-            case "y", "yes" -> {
-                context.output.print("Enter signature: ");
-                input = context.input.nextLine();
-                try {
-                    accBuilder.setSignatory(input);
-                } catch (IllegalArgumentException e) {
-                    context.output.println("Error: " + e.getMessage());
-                    return;
-                }
+    private TransactionOutcome tryWithdraw(Account account, BigDecimal amount) {
+        if (account.hasRestrictions()) {
+            context.printMessage("This action requires a signature.");
+            Username signature = context.inputHelper.getUsernameFromUser("Enter signature");
+            if (account.verifySignatory(signature)) {
+                context.printMessage("Signature verified.");
+            } else {
+                return TransactionOutcome.INSUFFICIENT_PRIVILEGES;
             }
         }
 
         try {
-            Account acc = accBuilder.build();
-            context.userSession.accounts.add(acc);
-        } catch (InvalidBuilderException e) {
-            context.output.println("Error: " + e.getMessage());
+            account.withdrawFunds(amount);
+            return TransactionOutcome.SUCCESS;
+        } catch (InsufficientFundsException e) {
+            return TransactionOutcome.INSUFFICIENT_FUNDS;
+        }
+    }
+
+    private void transferFunds() {
+        Account source = context.getAccountFromCurrentUser("Enter source account number");
+        Account target = context.getAccountFromCurrentUser("Enter target account number");
+        BigDecimal amount = context.inputHelper.getPositiveCurrencyAmountFromUser("Amount");
+        TransactionOutcome withdrawOutcome = tryWithdraw(source, amount);
+        switch (withdrawOutcome) {
+            case SUCCESS -> {
+                target.addFunds(amount);
+                context.printMessage("Succeeded");
+            }
+            case INSUFFICIENT_FUNDS -> {
+                context.printMessage("Failed: Insufficient funds.");
+            }
+            case INSUFFICIENT_PRIVILEGES -> {
+                context.printMessage("Failed: Insufficient privileges.");
+            }
         }
     }
 }

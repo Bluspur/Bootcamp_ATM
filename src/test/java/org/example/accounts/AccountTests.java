@@ -108,8 +108,8 @@ public class AccountTests {
         BigDecimal expectedBalance = new BigDecimal("0");
 
         try {
-            acc.subtractFunds(balanceToSubtract);
-        } catch (BalanceExceedsOverdraftException e) {
+            acc.withdrawFunds(balanceToSubtract);
+        } catch (InsufficientFundsException e) {
             throw new RuntimeException(e);
         }
 
@@ -124,8 +124,8 @@ public class AccountTests {
         BigDecimal balanceToSubtract = new BigDecimal("9999.99");
 
         assertThrows(
-                BalanceExceedsOverdraftException.class,
-                () -> acc.subtractFunds(balanceToSubtract));
+                InsufficientFundsException.class,
+                () -> acc.withdrawFunds(balanceToSubtract));
     }
 
     @Test
@@ -146,7 +146,7 @@ public class AccountTests {
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> acc.subtractFunds(negativeValue)
+                () -> acc.withdrawFunds(negativeValue)
         );
     }
 }

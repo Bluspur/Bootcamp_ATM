@@ -28,12 +28,7 @@ public class Database {
         }
     }
 
-    public void clear() {
-        usernameUserMap.clear();
-        userAccountsMap.clear();
-    }
-
-    public User add(Username username, Password password) throws UserAlreadyExistsException {
+    public User register(Username username, Password password) throws UserAlreadyExistsException {
         if (usernameUserMap.containsKey(username))
             throw new UserAlreadyExistsException("User with given username already exists.");
 
@@ -45,7 +40,12 @@ public class Database {
         return user;
     }
 
-    public List<Account> getUserAccounts(User user) {
+    public void clear() {
+        usernameUserMap.clear();
+        userAccountsMap.clear();
+    }
+
+    public List<Account> getAccountsForUser(User user) {
         return userAccountsMap.get(user);
     }
 }

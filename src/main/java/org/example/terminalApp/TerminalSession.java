@@ -2,53 +2,64 @@ package org.example.terminalApp;
 
 import org.example.Command;
 import org.example.InvalidCommandException;
-import org.example.accounts.Account;
+import org.example.accounts.*;
 import org.example.data.Database;
+import org.example.data.InvalidCredentialsException;
+import org.example.data.UserAlreadyExistsException;
+import org.example.data.UserNotFoundException;
+import org.example.terminalApp.input.InputHelper;
 import org.example.terminalApp.state.*;
+import org.example.users.Password;
+import org.example.users.User;
+import org.example.users.Username;
 
-import java.io.InputStream;
-import java.io.PrintStream;
 import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
 import java.util.EnumSet;
-import java.util.Scanner;
+import java.util.List;
 
 public class TerminalSession {
+    private final TerminalIO io;
+    public final InputHelper inputHelper;
     public final Database database;
-    public final UserSession userSession;
-    public final Scanner input;
-    public final PrintStream output;
-    public State state;
+
+    private State state = new LoggedOutState(this);
+    public UserSession userSession = null;
     private boolean running = false;
 
-    public TerminalSession(Database database, InputStream inputStream, PrintStream outputStream) {
+    public TerminalSession(TerminalIO terminalIO, Database database) {
+        this.io = terminalIO;
+        this.inputHelper = new InputHelper(io);
         this.database = database;
-        this.userSession = new UserSession();
-        this.input = new Scanner(inputStream);
-        this.output = outputStream;
-        this.state = new NoUserState(this);
     }
 
     public void run() {
-        printIntroMessage();
-        running = true;
         mainLoop();
     }
 
+    private void printIntroMessage() {
+        io.output.println("Welcome to Craig's ATM.");
+        io.output.println("Type \"help\" at any time to see a list of available commands.");
+        printLine();
+    }
+
     private void mainLoop() {
+        printIntroMessage();
+
+        running = true;
+
         while (running) {
             state.printContextualInformation();
             printUserPrompt();
-            String userInput = input.nextLine();
             try {
-                Command userCommand = Command.parse(userInput);
+                Command userCommand = inputHelper.getCommandFromUser();
                 state.handleCommand(userCommand);
             } catch (InvalidCommandException e) {
-                output.println("Error: " + e.getMessage());
+                printMessage("Error: " + e.getMessage());
+            } finally {
+                printLine();
             }
-            printLine();
         }
+
         printStopMessage();
     }
 
@@ -56,92 +67,126 @@ public class TerminalSession {
         running = false;
     }
 
-    private void printIntroMessage() {
-        output.println("Welcome to Craig's ATM.");
-        output.println("Type \"help\" at any time to see a list of available commands.");
-        printLine();
-    }
-
     private void printStopMessage() {
-        output.println("Exiting Application.");
+        io.output.println("Exiting Application.");
     }
 
     private void printLine() {
-        output.println("-------------------------------------------------------------"
+        io.output.println("-------------------------------------------------------------"
                 + "---------------------------------------------------------------------");
     }
 
     private void printUserPrompt() {
-        output.print(userSession.getCurrentUser() + " > ");
+        if (userSession == null) {
+            io.output.print("No User > ");
+        } else {
+            io.output.print(userSession.getUser().getUsername() + " > ");
+        }
     }
 
     public void printHelp(EnumSet<Command> validCommands) {
         for (Command command : validCommands) {
-            output.print(Command.getHelp(command));
+            io.output.print(Command.getHelp(command));
         }
+    }
+
+    public void printMessage(String message) {
+        io.output.print(message + "\n");
     }
 
     public void changeState(State state) {
         this.state = state;
     }
 
+    public LoginOutcome login(Username username, Password password) {
+        try {
+            User user = database.login(username, password);
+            List<Account> userAccounts = database.getAccountsForUser(user);
+            userSession = new UserSession(user, userAccounts);
+            return LoginOutcome.SUCCESS;
+        } catch (UserNotFoundException e) {
+            return LoginOutcome.USER_NOT_FOUND;
+        } catch (InvalidCredentialsException e) {
+            return LoginOutcome.INCORRECT_PASSWORD;
+        }
+    }
+
     public void logout() {
-        userSession.currentUser = null;
-        userSession.accounts = null;
-        changeState(new NoUserState(this));
+        userSession = null;
+        changeState(new LoggedOutState(this));
+    }
+
+    public RegisterOutcome register(Username username, Password password) {
+        try {
+            User user = database.register(username, password);
+            List<Account> userAccounts = database.getAccountsForUser(user);
+            userSession = new UserSession(user, userAccounts);
+            return RegisterOutcome.SUCCESS;
+        } catch (UserAlreadyExistsException e) {
+            return RegisterOutcome.USER_ALREADY_EXISTS;
+        }
     }
 
     public void printAccountsTable() {
-        output.printf(
+        io.output.printf(
                 "%-30s| %30s | %30s | %30s |%n",
                 "Number",
                 "Name",
                 "Type",
                 "Balance");
         printLine();
-        for (int i = 0; i < userSession.accounts.size(); i++) {
-            output.printf(
+        for (int i = 0; i < userSession.getAccounts().size(); i++) {
+            io.output.printf(
                     "%-30d| %30s | %30s | £%,29.2f |%n",
                     i + 1,
-                    userSession.accounts.get(i).getName(),
-                    userSession.accounts.get(i).getType(),
-                    userSession.accounts.get(i).getBalance()
+                    userSession.getAccounts().get(i).getName(),
+                    userSession.getAccounts().get(i).getType(),
+                    userSession.getAccounts().get(i).getBalance()
             );
         }
         printLine();
     }
 
-    public void printAccountDetailed(Account account) {
-        output.printf("%-15s %20s%n","Name: ", account.getName());
-        output.printf("%-15s %20s%n","Type: ", account.getType());
-        output.printf("%-15s %20s%n","Restricted?: ", account.hasRestrictions() ? "Yes" : "No");
-        output.printf("%-15s %,20.2f%n","Balance: £", account.getBalance());
+    public void printAccountInfo() {
+        if (userSession.getAccounts().size() == 0) {
+            io.output.println("You have no accounts.");
+        } else {
+            Account account = inputHelper
+                    .getAccountFromUser("Enter an Account Number to view", userSession);
+            printFormattedAccount(account);
+        }
+    }
+
+    private void printFormattedAccount(Account account) {
+        io.output.printf("%-15s %20s%n","Name: ", account.getName());
+        io.output.printf("%-15s %20s%n","Type: ", account.getType());
+        io.output.printf("%-15s %20s%n","Restricted?: ", account.hasRestrictions() ? "Yes" : "No");
+        io.output.printf("%-15s %,20.2f%n","Overdraft: £", account.getOverdraft());
+        io.output.printf("%-15s %,20.2f%n","Balance: £", account.getBalance());
         printLine();
     }
 
-    public BigDecimal pollUserForAmount() {
-        output.print("Enter amount: ");
-        String userInput = input.nextLine();
+    public void openNewAccount() {
+        var accBuilder = new AccountBuilder();
+
+        printMessage("Which type of account?");
+        accBuilder.setType(inputHelper.getAccountTypeFromUser());
+        accBuilder.setName(inputHelper.getAccountNameFromUser());
+        accBuilder.setOpeningBalance(inputHelper.getPositiveCurrencyAmountFromUser("Opening Balance: "));
+        printMessage("Does the account require a signatory?");
+        if (inputHelper.getBooleanFromUser()) {
+            Username signatory = inputHelper.getUsernameFromUser("Enter signature");
+            accBuilder.setSignatory(signatory);
+        }
         try {
-            return new BigDecimal(userInput, new MathContext(2, RoundingMode.HALF_EVEN));
-        } catch (NumberFormatException e) {
-            output.println("Error: Invalid amount.");
-            return null;
+            Account acc = accBuilder.build();
+            userSession.addAccount(acc);
+        } catch (InvalidBuilderException e) {
+            printMessage("Error: " + e.getMessage());
         }
     }
 
-    public Account selectAccount() {
-        output.print("Select an account: ");
-        String accountNumber = input.nextLine();
-        try {
-            int accountNumberInt = Integer.parseInt(accountNumber);
-            return userSession.accounts.get(accountNumberInt - 1);
-        } catch (NumberFormatException e) {
-            output.println("Error: Invalid account number.");
-            return null;
-        } catch (IndexOutOfBoundsException e) {
-            output.println("Error: No account with that number.");
-            return null;
-        }
+    public Account getAccountFromCurrentUser(String message) {
+            return inputHelper.getAccountFromUser(message, userSession);
     }
 }

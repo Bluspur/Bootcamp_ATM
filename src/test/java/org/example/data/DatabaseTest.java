@@ -24,7 +24,7 @@ class DatabaseTest {
         testDatabase = new Database();
 
         try {
-            testDatabase.add(testUsername, testPassword);
+            testDatabase.register(testUsername, testPassword);
         } catch (UserAlreadyExistsException e) {
             throw new RuntimeException(e);
         }
