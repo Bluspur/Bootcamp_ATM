@@ -4,7 +4,7 @@ import org.example.users.Username;
 
 import java.math.BigDecimal;
 
-public class Account {
+public class Account implements java.io.Serializable {
     private final String name;
     private final Username signatory;
     private BigDecimal balance;

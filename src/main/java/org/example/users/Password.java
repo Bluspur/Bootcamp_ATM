@@ -10,7 +10,7 @@ package org.example.users;
  * a valid format.
  * @author craig
  */
-public class Password {
+public class Password implements java.io.Serializable{
     final String value;
     static final int MINIMUM_LENGTH = 5;
     static final int MAXIMUM_LENGTH = 256;

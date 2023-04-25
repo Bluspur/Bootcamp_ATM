@@ -54,6 +54,7 @@ public class LoggedInState extends State {
         Account account = context.getAccountFromCurrentUser("Enter account number");
         BigDecimal amount = context.inputHelper.getPositiveCurrencyAmountFromUser("Amount");
         account.addFunds(amount);
+        context.serializeDatabase();
         context.printMessage("Funds added successfully.");
     }
 
@@ -62,7 +63,10 @@ public class LoggedInState extends State {
         BigDecimal amount = context.inputHelper.getPositiveCurrencyAmountFromUser("Amount");
         TransactionOutcome outcome = tryWithdraw(account, amount);
         switch (outcome) {
-            case SUCCESS -> context.printMessage("Succeeded");
+            case SUCCESS -> {
+                context.serializeDatabase();
+                context.printMessage("Succeeded");
+            }
             case INSUFFICIENT_FUNDS -> context.printMessage("Failed: Insufficient funds.");
             case INSUFFICIENT_PRIVILEGES -> context.printMessage("Failed: Insufficient privileges.");
         }
@@ -95,6 +99,7 @@ public class LoggedInState extends State {
         switch (withdrawOutcome) {
             case SUCCESS -> {
                 target.addFunds(amount);
+                context.serializeDatabase();
                 context.printMessage("Succeeded");
             }
             case INSUFFICIENT_FUNDS -> context.printMessage("Failed: Insufficient funds.");

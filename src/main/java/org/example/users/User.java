@@ -2,7 +2,7 @@ package org.example.users;
 
 import java.util.Objects;
 
-public class User {
+public class User implements java.io.Serializable {
     private final Username username;
     private final Password password;
 

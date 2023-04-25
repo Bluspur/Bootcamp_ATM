@@ -59,6 +59,7 @@ public class LoggedOutState extends State{
         switch (context.register(username, password)) {
             case SUCCESS -> {
                 context.printMessage("Registration Successful");
+                context.serializeDatabase();
                 context.changeState(new LoggedInState(context));
             }
             case USER_ALREADY_EXISTS -> context.printMessage("Registration Failed: User already exists.");

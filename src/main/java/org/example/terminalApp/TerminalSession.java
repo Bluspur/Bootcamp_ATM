@@ -3,16 +3,12 @@ package org.example.terminalApp;
 import org.example.Command;
 import org.example.InvalidCommandException;
 import org.example.accounts.*;
-import org.example.data.Database;
-import org.example.data.InvalidCredentialsException;
-import org.example.data.UserAlreadyExistsException;
-import org.example.data.UserNotFoundException;
-import org.example.terminalApp.input.InputHelper;
+import org.example.data.*;
 import org.example.terminalApp.state.*;
-import org.example.users.Password;
-import org.example.users.User;
-import org.example.users.Username;
+import org.example.terminalApp.input.*;
+import org.example.users.*;
 
+import java.io.IOException;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -179,6 +175,7 @@ public class TerminalSession {
         }
         try {
             Account acc = accBuilder.build();
+            serializeDatabase();
             userSession.addAccount(acc);
         } catch (InvalidBuilderException e) {
             printMessage("Error: " + e.getMessage());
@@ -187,5 +184,13 @@ public class TerminalSession {
 
     public Account getAccountFromCurrentUser(String message) {
             return inputHelper.getAccountFromUser(message, userSession);
+    }
+
+    public void serializeDatabase() {
+        try {
+            database.save();
+        } catch (IOException e) {
+            printMessage("Error: " + e.getMessage());
+        }
     }
 }

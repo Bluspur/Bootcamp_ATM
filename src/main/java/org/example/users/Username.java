@@ -10,7 +10,7 @@ import java.util.Objects;
  * a valid format.
  * @author craig
  */
-public class Username {
+public class Username implements java.io.Serializable {
     final String value;
     static final int MINIMUM_LENGTH = 6;
     static final int MAXIMUM_LENGTH = 256;
