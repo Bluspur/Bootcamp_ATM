@@ -1,7 +1,6 @@
 package org.example.terminalApp.state;
 
 import org.example.Command;
-import org.example.data.UserAlreadyExistsException;
 import org.example.terminalApp.TerminalSession;
 import org.example.users.Password;
 import org.example.users.Username;

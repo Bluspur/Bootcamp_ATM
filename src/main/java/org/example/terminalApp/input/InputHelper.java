@@ -14,10 +14,8 @@ import java.math.BigDecimal;
 public class InputHelper {
     private final TerminalIO io;
     private static final String DEFAULT_MESSAGE_CURRENCY = "Please enter a valid amount";
-    private static final String DEFAULT_MESSAGE_USERNAME = "Please enter a valid username";
-    private static final String DEFAULT_MESSAGE_PASSWORD = "Please enter a valid password";
     // Currency Regex by Tom Persing at https://regexlib.com/REDetails.aspx?regexp_id=196. Modified to remove dollar sign.
-    private final String CURRENCY_REGEX
+    private static final String CURRENCY_REGEX
             = "^([1-9][0-9]{0,2}(,[0-9]{3})*(\\.[0-9]{0,2})?|[1-9][0-9]*(\\.[0-9]{0,2})?|0(\\.[0-9]{0,2})?|(\\.[0-9]{1,2})?)$";
 
     public InputHelper(TerminalIO config) {
@@ -47,11 +45,7 @@ public class InputHelper {
 
     public Command getCommandFromUser() throws InvalidCommandException {
         String userInput = io.input.nextLine();
-        try {
-            return Command.parse(userInput);
-        } catch (InvalidCommandException e) {
-            throw e;
-        }
+        return Command.parse(userInput);
     }
 
     public AccountType getAccountTypeFromUser() {
@@ -78,7 +72,6 @@ public class InputHelper {
     public boolean getBooleanFromUser() {
         io.output.print("Yes[y] or No[n]: ");
         String userInput = io.input.nextLine();
-        boolean result;
 
         switch (userInput.toLowerCase()) {
             case "y" -> {
@@ -108,10 +101,6 @@ public class InputHelper {
         }
     }
 
-    public Username getUsernameFromUser() {
-        return getUsernameFromUser(DEFAULT_MESSAGE_USERNAME);
-    }
-
     public Username getUsernameFromUser(String message) {
         io.output.print(message + ": ");
         String userInput = io.input.nextLine();
@@ -121,10 +110,6 @@ public class InputHelper {
             io.output.println("Error: Invalid input. Please try again.");
             return getUsernameFromUser(message);
         }
-    }
-
-    public Password getPasswordFromUser() {
-        return getPasswordFromUser(DEFAULT_MESSAGE_PASSWORD);
     }
 
     public Password getPasswordFromUser(String message) {

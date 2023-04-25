@@ -13,7 +13,6 @@ import org.example.users.Password;
 import org.example.users.User;
 import org.example.users.Username;
 
-import java.math.BigDecimal;
 import java.util.EnumSet;
 import java.util.List;
 

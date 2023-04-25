@@ -11,11 +11,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class InputHelperTest {
     private InputHelper inputHelper;
 
-    // Setup InputHelper object with custom input and System.out.
-    void initHelper() {
-        initHelper("0.00");
-    }
-
     void initHelper(String mockInput) {
         var mockInputStream = new ByteArrayInputStream(mockInput.getBytes());
         TerminalIO config = new TerminalIO(mockInputStream, System.out);
@@ -67,8 +62,8 @@ class InputHelperTest {
         String validInput = "100.00";
 
         StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < invalidInputs.length; i++) {
-            stringBuilder.append(invalidInputs[i]).append("\n");
+        for (String invalidInput : invalidInputs) {
+            stringBuilder.append(invalidInput).append("\n");
         }
         stringBuilder.append(validInput).append("\n");
         String input = stringBuilder.toString();

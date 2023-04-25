@@ -62,15 +62,9 @@ public class LoggedInState extends State {
         BigDecimal amount = context.inputHelper.getPositiveCurrencyAmountFromUser("Amount");
         TransactionOutcome outcome = tryWithdraw(account, amount);
         switch (outcome) {
-            case SUCCESS -> {
-                context.printMessage("Succeeded");
-            }
-            case INSUFFICIENT_FUNDS -> {
-                context.printMessage("Failed: Insufficient funds.");
-            }
-            case INSUFFICIENT_PRIVILEGES -> {
-                context.printMessage("Failed: Insufficient privileges.");
-            }
+            case SUCCESS -> context.printMessage("Succeeded");
+            case INSUFFICIENT_FUNDS -> context.printMessage("Failed: Insufficient funds.");
+            case INSUFFICIENT_PRIVILEGES -> context.printMessage("Failed: Insufficient privileges.");
         }
     }
 
@@ -103,12 +97,8 @@ public class LoggedInState extends State {
                 target.addFunds(amount);
                 context.printMessage("Succeeded");
             }
-            case INSUFFICIENT_FUNDS -> {
-                context.printMessage("Failed: Insufficient funds.");
-            }
-            case INSUFFICIENT_PRIVILEGES -> {
-                context.printMessage("Failed: Insufficient privileges.");
-            }
+            case INSUFFICIENT_FUNDS -> context.printMessage("Failed: Insufficient funds.");
+            case INSUFFICIENT_PRIVILEGES -> context.printMessage("Failed: Insufficient privileges.");
         }
     }
 }

@@ -1,5 +1,6 @@
 package org.example.accounts;
 
+import org.example.users.Username;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -54,7 +55,7 @@ public class AccountTests {
         accBuilder.setName("Tommy's Account");
         accBuilder.setType(AccountType.CLIENT);
         accBuilder.setOpeningBalance(new BigDecimal("1234.56"));
-        accBuilder.setSignatory("Joe Blogs");
+        accBuilder.setSignatory(new Username("Joe Blogs"));
         try {
             return accBuilder.build();
         } catch (InvalidBuilderException e) {
@@ -64,7 +65,7 @@ public class AccountTests {
 
     @Test
     void testAccountWithSignatoryVerifySignatoryReturnsTrueForCorrectSignature() {
-        String correctSignature = "Joe Blogs";
+        var correctSignature = new Username("Joe Blogs");
         Account acc = setupTestAccount();
 
         assertTrue(acc.verifySignatory(correctSignature));
@@ -72,7 +73,7 @@ public class AccountTests {
 
     @Test
     void testAccountWithSignatoryVerifySignatoryReturnsFalseForIncorrectSignature() {
-        String incorrectSignature = "Billy Bob Jones";
+        var incorrectSignature = new Username("Billy Bob Jones");
         Account acc = setupTestAccount();
 
         assertFalse(acc.verifySignatory(incorrectSignature));

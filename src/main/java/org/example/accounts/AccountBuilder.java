@@ -3,7 +3,6 @@ package org.example.accounts;
 import org.example.users.Username;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 
 public class AccountBuilder {
     private String name = "";
