@@ -12,29 +12,32 @@ import java.util.List;
 import java.util.Map;
 
 public class Database implements java.io.Serializable{
-    private final Map<Username, User> usernameUserMap = new HashMap<>();
-    private final Map<User, List<Account>> userAccountsMap = new HashMap<>();
+    private final Map<Username, User> usernameUserMap;
+    private final Map<User, List<Account>> userAccountsMap;
     private final File databaseFile;
 
     public Database(File databaseFile) {
         this.databaseFile = databaseFile;
+        usernameUserMap = new HashMap<>();
+        userAccountsMap = new HashMap<>();
     }
 
+    // Both save() and load() methods are derived from the following webpage:
+    // https://mkyong.com/java/java-serialization-examples/
     public void save() throws IOException {
-        FileOutputStream fileOutputStream = new FileOutputStream(databaseFile);
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-        objectOutputStream.writeObject(this);
-        objectOutputStream.close();
-        fileOutputStream.close();
+        try (FileOutputStream fileOutputStream = new FileOutputStream(databaseFile);
+             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
+            objectOutputStream.writeObject(this);
+            objectOutputStream.flush();
+        }
     }
 
     public static Database load(File databaseFile) throws IOException, ClassNotFoundException {
         Database database;
-        FileInputStream fileInputStream = new FileInputStream(databaseFile);
-        ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-        database = (Database) objectInputStream.readObject();
-        objectInputStream.close();
-        fileInputStream.close();
+        try (FileInputStream fileInputStream = new FileInputStream(databaseFile);
+             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
+            database = (Database) objectInputStream.readObject();
+        }
         return database;
     }
 

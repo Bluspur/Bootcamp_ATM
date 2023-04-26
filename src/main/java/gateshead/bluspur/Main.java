@@ -5,6 +5,7 @@ import gateshead.bluspur.terminalApp.TerminalIO;
 import gateshead.bluspur.terminalApp.TerminalSession;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class Main {
@@ -12,19 +13,15 @@ public class Main {
         // Try to load database from file, if it doesn't exist, create a new one.
         Database database;
         File databaseFile = new File(System.getProperty("user.home"), "database.ser");
-        if (databaseFile.exists()) {
-            try {
-                database = Database.load(databaseFile);
-            } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
-                return;
-            }
-        } else {
+
+        try {
+            database = Database.load(databaseFile);
+        } catch (IOException | ClassNotFoundException e) {
             database = new Database(databaseFile);
             try {
                 database.save();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException i) {
+                i.printStackTrace();
                 return;
             }
         }
