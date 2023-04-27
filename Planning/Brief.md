@@ -21,6 +21,6 @@ ___
 - [ ] Explore Java documentation generation.
 ### Stretch Goals Given Extra Time
 - [x] Explore techniques to manage polling user input.
-	- Toyed with the idea of working with an external i/o library, but ultimately was not neccessary. 
+	- Toyed with the idea of working with an external i/o library, but ultimately was not necessary. 
 - [x] Explore GUI options in Java.
 	- Opted for a terminal interface instead. For the sake of simplicity. 

@@ -23,9 +23,9 @@ _Note that this isn't an exhaustive mock-up. I just needed something to help me 
 - Some prompt that the user has no accounts and should open one, or automatically print a list of their accounts if they have any.
 - ___NOTE: Formatted table of accounts should include: account number (from 1), name, type, and balance. Probably going to be made of pipes and dashes.___
 
-| Number |  Name | Type | Balance |
-| -- | -- | -- | -- |
-| 1 | My First Account | Client | £1234.56 |
+| Number | Name             | Type   | Balance  |
+|--------|------------------|--------|----------|
+| 1      | My First Account | Client | £1234.56 |
 
 - Now that the user is logged in, they should be able to perform a number of account actions:
 	- Opening a new account.
