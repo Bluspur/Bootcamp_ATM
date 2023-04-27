@@ -5,12 +5,10 @@ import gateshead.bluspur.terminalApp.TerminalIO;
 import gateshead.bluspur.terminalApp.TerminalSession;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
-        // Try to load database from file, if it doesn't exist, create a new one.
         Database database;
         File databaseFile = new File(System.getProperty("user.home"), "database.ser");
 

@@ -24,6 +24,10 @@ public class UserSession {
         return !accounts.isEmpty();
     }
 
+    public int getAccountsCount() {
+        return accounts.size();
+    }
+
     public List<Account> getAccounts() {
         return accounts;
     }

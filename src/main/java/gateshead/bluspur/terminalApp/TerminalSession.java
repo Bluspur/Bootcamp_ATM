@@ -139,7 +139,6 @@ public class TerminalSession {
                     userSession.getAccounts().get(i).getBalance()
             );
         }
-        printLine();
     }
 
     public void printAccountInfo() {
@@ -175,8 +174,8 @@ public class TerminalSession {
         }
         try {
             Account acc = accBuilder.build();
-            serializeDatabase();
             userSession.addAccount(acc);
+            serializeDatabase();
         } catch (InvalidBuilderException e) {
             printMessage("Error: " + e.getMessage());
         }

@@ -34,16 +34,48 @@ public class LoggedInState extends State {
             context.printMessage("You have no open accounts. Open[o] an account to continue.");
     }
 
+    private void printNoAccountsPrompt() {
+        context.printMessage("You need to have at least one account to perform this action.");
+    }
+
     @Override
     public void handleCommand(Command command) {
         switch (command) {
             case Open -> context.openNewAccount();
             case Logout -> context.logout();
-            case View -> context.printAccountInfo();
-            case List -> context.printAccountsTable();
-            case Add -> addFundsToAccount();
-            case Withdraw -> withdrawFundsFromAccount();
-            case Transfer -> transferFunds();
+            case View -> {
+                if (context.userSession.hasAccounts())
+                    context.printAccountInfo();
+                else
+                    printNoAccountsPrompt();
+            }
+            case List -> {
+                if (context.userSession.hasAccounts())
+                    context.printAccountsTable();
+                else
+                    printNoAccountsPrompt();
+            }
+            case Add -> {
+                if (context.userSession.hasAccounts())
+                    addFundsToAccount();
+                else
+                    printNoAccountsPrompt();
+            }
+            case Withdraw -> {
+                if (context.userSession.hasAccounts())
+                    withdrawFundsFromAccount();
+                else
+                    printNoAccountsPrompt();
+            }
+            case Transfer -> {
+                if (context.userSession.getAccountsCount() > 0)
+                    if (context.userSession.getAccountsCount() > 1)
+                        transferFunds();
+                    else
+                        context.printMessage("You need at least two accounts to transfer funds.");
+                else
+                    printNoAccountsPrompt();
+            }
             case Help -> context.printHelp(validCommands);
             case Quit -> context.stop();
             default -> context.printMessage("Error: " + command
