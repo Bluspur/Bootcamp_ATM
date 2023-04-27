@@ -26,4 +26,5 @@ One addition I made to the requirements was a basic form of database persistence
 
 ## Documentation
 I have included a copy of a Obsidian markdown book that I was using throughout the project as a form of planning. I used it mainly to just jot down ideas about what a class should be doing and as a bit of a brain dump on certain problems regaring implementation. I became less judicious about it towards the end of the project, when I had a clearer understanding of what the outcome was going to look like, but I wrote quite a bit about my most foundational types.
+
 I also spent a good deal of time at the end providing JavaDoc comments for all of the public API on my classes and also for any private methods that I felt needed some extra explanation. 
