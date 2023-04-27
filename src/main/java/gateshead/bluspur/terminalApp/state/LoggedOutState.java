@@ -7,6 +7,10 @@ import gateshead.bluspur.terminalApp.TerminalSession;
 
 import java.util.EnumSet;
 
+/**
+ * State representing the terminal session when no user is logged in.
+ * @author craig
+ */
 public class LoggedOutState extends State{
     private final EnumSet<Command> validCommands = EnumSet.of(
             Command.Login,
@@ -41,7 +45,7 @@ public class LoggedOutState extends State{
         Username username = context.inputHelper.getUsernameFromUser("Enter a Username");
         Password password = context.inputHelper.getPasswordFromUser("Enter a Password");
 
-        switch (context.login(username, password)) {
+        switch (context.logIn(username, password)) {
             case SUCCESS -> {
                 context.printMessage("Login Successful");
                 context.changeState(new LoggedInState(context));

@@ -10,7 +10,7 @@ package gateshead.bluspur.users;
  * a valid format.
  * @author craig
  */
-public class Password implements java.io.Serializable{
+public class Password implements java.io.Serializable {
     final String value;
     static final int MINIMUM_LENGTH = 5;
     static final int MAXIMUM_LENGTH = 256;
@@ -31,6 +31,16 @@ public class Password implements java.io.Serializable{
         return false;
     }
 
+    /**
+     * Validates the password against the following criteria:
+     * <ul>
+     *     <li>Must not be null</li>
+     *     <li>Must be longer than {@link #MINIMUM_LENGTH} characters</li>
+     *     <li>Must be shorter than {@link #MAXIMUM_LENGTH} characters</li>
+     * </ul>
+     * @param password The password to validate
+     * @throws IllegalArgumentException If the password is invalid
+     */
     private void validate(String password) throws IllegalArgumentException {
         if (password == null)
             throw new IllegalArgumentException("Password must not be null.");

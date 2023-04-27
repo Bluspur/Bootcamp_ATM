@@ -12,21 +12,38 @@ import java.io.IOException;
 import java.util.EnumSet;
 import java.util.List;
 
+/**
+ * Class that represents a session of the terminal application.
+ * This class is responsible for the main loop of the application.
+ * It also holds the current log-in state and a reference to the current user session.
+ * @author craig
+ */
 public class TerminalSession {
     private final TerminalIO io;
     public final InputHelper inputHelper;
     public final Database database;
 
     private State state = new LoggedOutState(this);
+    /**
+     * The current user session.
+     */
     public UserSession userSession = null;
     private boolean running = false;
 
+    /**
+     * Creates a new terminal session.
+     * @param terminalIO The terminal IO object.
+     * @param database The database object.
+     */
     public TerminalSession(TerminalIO terminalIO, Database database) {
         this.io = terminalIO;
         this.inputHelper = new InputHelper(io);
         this.database = database;
     }
 
+    /**
+     * Begins the main loop of the application.
+     */
     public void run() {
         mainLoop();
     }
@@ -37,6 +54,10 @@ public class TerminalSession {
         printLine();
     }
 
+    /**
+     * Manages the main loop of the application.
+     * Handles collecting user input and passing it to the current state.
+     */
     private void mainLoop() {
         printIntroMessage();
 
@@ -58,6 +79,9 @@ public class TerminalSession {
         printStopMessage();
     }
 
+    /**
+     * Stops the main loop of the application.
+     */
     public void stop() {
         running = false;
     }
@@ -79,23 +103,44 @@ public class TerminalSession {
         }
     }
 
+    /**
+     * Prints help messages for the given commands.
+     * @param validCommands The EnumSet of commands to print the help message for.
+     */
     public void printHelp(EnumSet<Command> validCommands) {
         for (Command command : validCommands) {
             io.output.print(Command.getHelp(command));
         }
     }
 
+    /**
+     * Convenience method for allowing State objects to print to the terminal without
+     * requiring access to the TerminalIO.
+     * @param message The message to print.
+     */
     public void printMessage(String message) {
         io.output.print(message + "\n");
     }
 
+    /**
+     * Method that changes the current state of the application.
+     * @param state The new state.
+     */
     public void changeState(State state) {
         this.state = state;
     }
 
-    public LoginOutcome login(Username username, Password password) {
+    /**
+     * Method to attempt to log in a user from the database.
+     * If the user is found and the password is correct, the user is logged in and the
+     * user session is set.
+     * @param username The username of the user to log in.
+     * @param password The password of the user to log in.
+     * @return Enum representing the outcome of the login attempt.
+     */
+    public LoginOutcome logIn(Username username, Password password) {
         try {
-            User user = database.login(username, password);
+            User user = database.logIn(username, password);
             List<Account> userAccounts = database.getAccountsForUser(user);
             userSession = new UserSession(user, userAccounts);
             return LoginOutcome.SUCCESS;
@@ -106,11 +151,22 @@ public class TerminalSession {
         }
     }
 
+    /**
+     * Reset the userSession and change the state to LoggedOutState.
+     */
     public void logout() {
         userSession = null;
         changeState(new LoggedOutState(this));
     }
 
+    /**
+     * Method to attempt to register a new user in the database.
+     * If the user is successfully registered, the user is logged in and the user session
+     * is set.
+     * @param username The username of the user to register.
+     * @param password The password of the user to register.
+     * @return Enum representing the outcome of the registration attempt.
+     */
     public RegisterOutcome register(Username username, Password password) {
         try {
             User user = database.register(username, password);
@@ -122,6 +178,9 @@ public class TerminalSession {
         }
     }
 
+    /**
+     * Helper method to format and print a table of the current user's accounts.
+     */
     public void printAccountsTable() {
         io.output.printf(
                 "%-30s| %30s | %30s | %30s |%n",
@@ -141,8 +200,12 @@ public class TerminalSession {
         }
     }
 
+    /**
+     * Method that prints the details of a single account.
+     * If the user has no accounts, a message informing them is printed.
+     */
     public void printAccountInfo() {
-        if (userSession.getAccounts().size() == 0) {
+        if (userSession.getAccountsCount() < 1) {
             io.output.println("You have no accounts.");
         } else {
             Account account = inputHelper
@@ -160,6 +223,17 @@ public class TerminalSession {
         printLine();
     }
 
+    /**
+     * Method that manages the process of creating a new account.
+     * The user is prompted for the type of account, the name of the account, and the
+     * opening balance.
+     * If the account requires a signatory, the user is prompted for a username.
+     * If the account is successfully created, it is added to the user's accounts and
+     * the database is serialized.
+     * If the account cannot be created, prints an error.
+     * @see AccountBuilder
+     * @see Account
+     */
     public void openNewAccount() {
         var accBuilder = new AccountBuilder();
 
@@ -181,10 +255,20 @@ public class TerminalSession {
         }
     }
 
+    /**
+     * Convenience method for state objects to be able to get an account from the user.
+     * @param message The message to prompt the user with.
+     * @return The account selected by the user.
+     */
     public Account getAccountFromCurrentUser(String message) {
             return inputHelper.getAccountFromUser(message, userSession);
     }
 
+    /**
+     * Method that tries to save the database to file.
+     * If the database cannot be saved, prints an error.
+     * @see Database
+     */
     public void serializeDatabase() {
         try {
             database.save();

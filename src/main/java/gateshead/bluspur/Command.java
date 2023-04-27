@@ -1,5 +1,11 @@
 package gateshead.bluspur;
 
+/**
+ * An enum representing all possible commands that can be entered by the user.
+ * Provides a method to parse a string into a command.
+ * Provides a method to get the help text for a command.
+ * @author craig
+ */
 public enum Command {
     Login,
     Logout,
@@ -12,6 +18,13 @@ public enum Command {
     List,
     Help,
     Quit;
+
+    /**
+     * Parses a string into a command.
+     * @param rawCommand The string to parse.
+     * @return The parsed command.
+     * @throws InvalidCommandException If the string is not a valid command.
+     */
     public static Command parse(String rawCommand) throws InvalidCommandException {
         rawCommand = rawCommand.toLowerCase();
         return switch (rawCommand) {
@@ -30,6 +43,11 @@ public enum Command {
         };
     }
 
+    /**
+     * Gets the help text for a command.
+     * @param command The command to get the help text for.
+     * @return The help text for the command.
+     */
     public static String getHelp(Command command) {
         return switch (command) {
             case Login -> String.format("%-20s| Use to log in to an existing account.\n", "Login[l]");

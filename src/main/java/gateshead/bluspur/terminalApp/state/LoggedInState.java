@@ -10,6 +10,9 @@ import gateshead.bluspur.terminalApp.TransactionOutcome;
 import java.math.BigDecimal;
 import java.util.EnumSet;
 
+/**
+ * State representing the terminal session when a user is logged in.
+ */
 public class LoggedInState extends State {
     private final EnumSet<Command> validCommands = EnumSet.of(
             Command.Add,

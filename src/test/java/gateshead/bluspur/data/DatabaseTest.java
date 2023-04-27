@@ -58,7 +58,7 @@ class DatabaseTest {
     void testGetUserThrowsExceptionWhenUserNotInDatabase() {
         Username badUsername = new Username("Tommy Atkins");
 
-        assertThrows(UserNotFoundException.class, () -> testDatabase.login(badUsername, testPassword));
+        assertThrows(UserNotFoundException.class, () -> testDatabase.logIn(badUsername, testPassword));
     }
 
     @Test
@@ -66,7 +66,7 @@ class DatabaseTest {
         User actualUser;
 
         try {
-            actualUser = testDatabase.login(testUsername, testPassword);
+            actualUser = testDatabase.logIn(testUsername, testPassword);
         } catch (UserNotFoundException | InvalidCredentialsException e) {
             throw new RuntimeException(e);
         }
@@ -78,6 +78,6 @@ class DatabaseTest {
     void testLoginThrowsExceptionWhenIncorrectPasswordGiven() {
         Password badPassword = new Password("badPass");
 
-        assertThrows(InvalidCredentialsException.class, () -> testDatabase.login(testUsername, badPassword));
+        assertThrows(InvalidCredentialsException.class, () -> testDatabase.logIn(testUsername, badPassword));
     }
 }

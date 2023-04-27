@@ -38,6 +38,17 @@ public class Username implements java.io.Serializable {
         return Objects.hash(value);
     }
 
+    /**
+     * Validates the username against the following criteria:
+     * <ul>
+     *     <li>Must not be null</li>
+     *     <li>Must be longer than {@link #MINIMUM_LENGTH} characters</li>
+     *     <li>Must be shorter than {@link #MAXIMUM_LENGTH} characters</li>
+     *     <li>Must only contain alphanumeric characters or spaces</li>
+     * </ul>
+     * @param username The username to validate
+     * @throws IllegalArgumentException If the username is invalid
+     */
     private void validate(String username) throws IllegalArgumentException {
         if (username == null)
             throw new IllegalArgumentException("Username must not be null.");
