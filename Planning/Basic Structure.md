@@ -1,8 +1,8 @@
-- [[User]]
+- [[User]] : Simple class for storing a single user in the database. 
+	- Username : A String wrapper for providing construction time validation.
+	- Password : A String wrapper for providing construction time validation.
 - [[Account]]
-	-  Client (Like a Personal Account?)
-	-  Small Business
-	-  Community (What does this mean?)
-- Login
-- Transaction
-- UserDatabase
+- Database
+	- Username - User database : Map for quickly checking if a username is taken and a given user already exists.
+	- User - List\<[[Account]]\> : Map for identifying which accounts belong to which user.
+	- 

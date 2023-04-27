@@ -24,7 +24,7 @@ Thirdly, because there is some validation to do on both the username and passwor
 		- Doesn't need to be unique.
 		- Must not be null!
 	- Later could be used to introduce some kind of encryption.
-- `verifyUser((string)username, (string)password) -> boolean`
-	- A method that takes in two strings, one for a username and one for a password.
+- `verifyUser(username, password) -> boolean`
+	- A method that takes a Username and Password.
 	- It then checks those arguments against its own values and if they are <b>BOTH</b> the same then it returns true, otherwise it returns false.
-	- The reason for using `String` and not `Username` or `Password` is that once the user is created, we are not interested in validating anything we pass in for comparison.
+	- Originally this method took string values and not Username/Password, but I opted eventually to switch. This was mostly a point of convenience and to make it clear exactly what kind of values should be passed in.
